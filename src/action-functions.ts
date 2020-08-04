@@ -1,4 +1,4 @@
-import { nbformat } from '@jupyterlab/coreutils';
+import * as nbformat from '@jupyterlab/nbformat';
 import { ICellModel, CodeCellModel, MarkdownCell } from '@jupyterlab/cells';
 import { NotebookActions, Notebook } from '@jupyterlab/notebook';
 
