@@ -19,27 +19,31 @@ export class ActionFunctions {
         console.log('added cell at index', index, cell);
 
         // code from NotebookModel.fromJSON() --> @jupyterlab/notebook/src/model.ts
-        const factory = this.notebook.model.contentFactory;
-        let cellModel: ICellModel;
+        if (this.notebook && this.notebook.model) {
+            const factory = this.notebook.model.contentFactory;
+            let cellModel: ICellModel;
 
-        switch (cell.cell_type) {
-            case 'code':
-                cellModel = factory.createCodeCell({ cell });
-                break;
-            case 'markdown':
-                cellModel = factory.createMarkdownCell({ cell });
-                break;
-            case 'raw':
-                cellModel = factory.createRawCell({ cell });
-                break;
-            default:
-                console.error('Unknown cell type', cell.cell_type);
-                return null;
+            switch (cell.cell_type) {
+                case 'code':
+                    cellModel = factory.createCodeCell({ cell });
+                    break;
+                case 'markdown':
+                    cellModel = factory.createMarkdownCell({ cell });
+                    break;
+                case 'raw':
+                    cellModel = factory.createRawCell({ cell });
+                    break;
+                default:
+                    console.error('Unknown cell type', cell.cell_type);
+                    return null;
+            }
+
+            this.pauseTracking = true;
+            this.notebook.model.cells.insert(index, cellModel);
+            this.pauseTracking = false;
+        } else {
+            throw new Error("Notebook or Model Null");            
         }
-
-        this.pauseTracking = true;
-        this.notebook.model.cells.insert(index, cellModel);
-        this.pauseTracking = false;
 
         return null;
     }
@@ -47,7 +51,9 @@ export class ActionFunctions {
     public async removeCell(index: number) {
         console.log('removed cell at index', index);
         this.pauseTracking = true;
-        this.notebook.model.cells.remove(index);
+        if (this.notebook && this.notebook.model) {
+            this.notebook.model.cells.remove(index);
+        }
         this.pauseTracking = false;
         return null;
     }
@@ -56,7 +62,11 @@ export class ActionFunctions {
         console.log('moved cell to index', fromIndex, toIndex);
 
         this.pauseTracking = true;
-        this.notebook.model.cells.move(fromIndex, toIndex);
+        if (this.notebook && this.notebook.model) {
+            this.notebook.model.cells.move(fromIndex, toIndex);
+        } else {
+            throw new Error("Notebook or Model Null");            
+        }
         this.pauseTracking = false;
 
         return null;
@@ -82,45 +92,57 @@ export class ActionFunctions {
         return null;
     }
 
-    public async cellValue(index: number, value: string) {
-        const cell = this.notebook.model.cells.get(index);
-        if (cell) {
-            cell.value.text = value;
+    public async cellValue(index: number, value: string) {        
+        if (this.notebook && this.notebook.model) {
+            const cell = this.notebook.model.cells.get(index);
+            if (cell) {
+                cell.value.text = value;
+            }
+        } else {
+            throw new Error("Notebook or Model Null");            
         }
     }
 
     public async cellOutputs(index: number, outputs: nbformat.IOutput[]) {
-        const cell = this.notebook.widgets[index];
-        const cellModel = this.notebook.model.cells.get(index);
-        if (cellModel) {
-            switch (cellModel.type) {
-                case 'markdown':
-                    (cell as MarkdownCell).rendered = true;
-                    break;
-                case 'code':
-                    (cellModel as CodeCellModel).outputs.fromJSON(outputs);
-                    break;
-                default:
-                    break;
+        if (this.notebook && this.notebook.model) {
+            const cell = this.notebook.widgets[index];        
+            const cellModel = this.notebook.model.cells.get(index);
+            if (cellModel) {
+                switch (cellModel.type) {
+                    case 'markdown':
+                        (cell as MarkdownCell).rendered = true;
+                        break;
+                    case 'code':
+                        (cellModel as CodeCellModel).outputs.fromJSON(outputs);
+                        break;
+                    default:
+                        break;
+                }
             }
+        } else {
+            throw new Error("Notebook or Model Null");            
         }
     }
 
     public async clearOutputs(index: number) {
-        const cell = this.notebook.widgets[index];
-        const cellModel = this.notebook.model.cells.get(index);
-        if (cellModel) {
-            switch (cellModel.type) {
-                case 'markdown':
-                    (cell as MarkdownCell).rendered = false;
-                    break;
-                case 'code':
-                    (cellModel as CodeCellModel).outputs.clear();
-                    break;
-                default:
-                    break;
+        if (this.notebook && this.notebook.model) {
+            const cell = this.notebook.widgets[index];
+            const cellModel = this.notebook.model.cells.get(index);
+            if (cellModel) {
+                switch (cellModel.type) {
+                    case 'markdown':
+                        (cell as MarkdownCell).rendered = false;
+                        break;
+                    case 'code':
+                        (cellModel as CodeCellModel).outputs.clear();
+                        break;
+                    default:
+                        break;
+                }
             }
-        }
+        } else {
+        throw new Error("Notebook or Model Null");            
+    }
     }
 
     public async enableOutputScrolling(cellIndex: number) {

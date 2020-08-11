@@ -3,7 +3,7 @@ import { Action, ReversibleAction } from '@visualstorytelling/provenance-core';
 import { IObservableList } from '@jupyterlab/observables';
 import { ICellModel, Cell, CodeCell } from '@jupyterlab/cells';
 import { NotebookProvenance } from './notebook-provenance';
-import { toArray } from '@phosphor/algorithm';
+import { toArray } from '@lumino/algorithm';
 
 
 /**
@@ -24,7 +24,11 @@ export class NotebookProvenanceTracker {
     // this.notebookProvenance.notebook.activeCellChanged.connect(() => {
     //   console.log(['activeCellChanged', arguments]);
     // });
-    this.notebookProvenance.notebook.model.cells.changed.connect(this._onCellsChanged, this);
+    if (this.notebookProvenance && this.notebookProvenance.notebook && this.notebookProvenance.notebook.model) {
+      this.notebookProvenance.notebook.model.cells.changed.connect(this._onCellsChanged, this);
+    } else {
+      throw new Error("Notebook or notebookProvenance Null");            
+  }
 
     this.trackCellOutput();
 
@@ -48,16 +52,20 @@ export class NotebookProvenanceTracker {
       const activeCell = notebook.activeCell;
       if (typeof prevActiveCellValue !== 'undefined') {
         // Check if cell has changed
-        const cell = notebook.model.cells.get(prevActiveCellIndex);
-        if (cell && prevActiveCellValue !== cell.value.text) {
-          // if so add to prov
-          const cellChangedAction = {
-            do: 'cellValue',
-            doArguments: [prevActiveCellIndex, cell.value.text],
-            undo: 'cellValue',
-            undoArguments: [prevActiveCellIndex, prevActiveCellValue]
-          };
-          Promise.resolve(this.notebookProvenance.tracker.applyAction(cellChangedAction, true));
+        if (notebook && notebook.model) {
+          const cell = notebook.model.cells.get(prevActiveCellIndex);
+          if (cell && prevActiveCellValue !== cell.value.text) {
+            // if so add to prov
+            const cellChangedAction = {
+              do: 'cellValue',
+              doArguments: [prevActiveCellIndex, cell.value.text],
+              undo: 'cellValue',
+              undoArguments: [prevActiveCellIndex, prevActiveCellValue]
+            };
+            Promise.resolve(this.notebookProvenance.tracker.applyAction(cellChangedAction, true));
+          }
+        } else {
+          throw new Error("Notebook or Model Null");            
         }
       }
 
@@ -82,31 +90,35 @@ export class NotebookProvenanceTracker {
   trackCellOutput(): any {
     NotebookActions.executed.connect((_dummy, obj: { notebook: Notebook; cell: Cell }) => {
       console.log('Cell ran', obj.cell);
-      const index = toArray(obj.notebook.model.cells.iter()).indexOf(obj.cell.model);
-      let action: ReversibleAction;
+      if (obj && obj.notebook && obj.notebook.model) {
+        const index = toArray(obj.notebook.model.cells.iter()).indexOf(obj.cell.model);
+        let action: ReversibleAction;
 
-      switch (obj.cell.model.type) {
-        case 'markdown':
-          action = {
-            do: 'cellOutputs',
-            doArguments: [index, []],
-            undo: 'clearOutputs',
-            undoArguments: [index]
-          };
-          Promise.resolve(this.notebookProvenance.tracker.applyAction(action, true));
-          break;
-        case 'code':
-          const outputs = (obj.cell as CodeCell).model.outputs.toJSON();
-          action = {
-            do: 'cellOutputs',
-            doArguments: [index, outputs],
-            undo: 'clearOutputs',
-            undoArguments: [index]
-          };
-          Promise.resolve(this.notebookProvenance.tracker.applyAction(action, true));
-          break;
-        default:
-          break;
+        switch (obj.cell.model.type) {
+          case 'markdown':
+            action = {
+              do: 'cellOutputs',
+              doArguments: [index, []],
+              undo: 'clearOutputs',
+              undoArguments: [index]
+            };
+            Promise.resolve(this.notebookProvenance.tracker.applyAction(action, true));
+            break;
+          case 'code':
+            const outputs = (obj.cell as CodeCell).model.outputs.toJSON();
+            action = {
+              do: 'cellOutputs',
+              doArguments: [index, outputs],
+              undo: 'clearOutputs',
+              undoArguments: [index]
+            };
+            Promise.resolve(this.notebookProvenance.tracker.applyAction(action, true));
+            break;
+          default:
+            break;
+        }
+      } else {
+        throw new Error("Obj or Notebook or Model Null");            
       }
     }, this);
   }
