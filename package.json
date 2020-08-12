@@ -48,7 +48,7 @@
     "@visualstorytelling/provenance-core": "1.1.5",
     "@visualstorytelling/provenance-tree-visualization-react": "1.0.3",
     "jupyterlab": "0.17.5",
-    "node-sass": "4.9.3",
+    "node-sass": "4.14.1",
     "react": "16.9.0",
     "react-dom": "16.9.0"
   },
