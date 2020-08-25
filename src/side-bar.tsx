@@ -10,8 +10,6 @@ import { Widget } from "@lumino/widgets";
 import { Message } from "@lumino/messaging";
 import "../style/side-bar.css";
 
-
-
 import
 {
     initProvenance,
