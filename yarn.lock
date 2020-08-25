@@ -1211,10 +1211,9 @@
     "@types/prop-types" "*"
     csstype "^2.2.0"
 
-"@visdesignlab/trrack-vis@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@visdesignlab/trrack-vis/-/trrack-vis-1.1.0.tgz#e8d90d2e9f32c37a954693e2de4b7cbb064df4bf"
-  integrity sha512-QT8cnXQWMAZdecroQvL79K0ZnaukJE0Dpzc89ar4+MFXOxALgcAthP6y62ldP56S23KamfV2oKf8IOperA3QvQ==
+"@visdesignlab/trrack-vis@richardwolfmayr/trrack-vis#release-test":
+  version "0.0.0"
+  resolved "https://codeload.github.com/richardwolfmayr/trrack-vis/tar.gz/3e181e9315a4a9a25d66b59af0b1d3d2135610e7"
   dependencies:
     "@visdesignlab/trrack" "^1.2.0"
     d3 "^5.15.0"
