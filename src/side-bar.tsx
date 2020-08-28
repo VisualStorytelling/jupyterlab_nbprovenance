@@ -1,7 +1,4 @@
 "use strict";
-
-// import * as React from 'react';
-// import * as ReactDOM from 'react-dom';
 import {EventTypes, NotebookProvenance} from './notebook-provenance';
 import { LabShell } from "@jupyterlab/application";
 import { NotebookPanel, Notebook, INotebookTracker } from '@jupyterlab/notebook';
@@ -9,33 +6,16 @@ import { notebookModelCache } from '.';
 import { Widget } from "@lumino/widgets";
 import { Message } from "@lumino/messaging";
 import "../style/side-bar.css";
-
 import
 {
-    initProvenance,
-    ProvenanceGraph,
     Provenance,
-    ActionFunction,
-    SubscriberFunction,
-    NodeMetadata,
-    NodeID,
-    Diff,
-    RootNode,
-    StateNode,
-    ProvenanceNode,
-    isStateNode,
-    Nodes,
-    CurrentNode,
-    Artifacts,
-    Extra
+    NodeID
 } from "@visdesignlab/trrack";
 
 import {
-    ProvVis,
-    EventConfig,
-    // Config,
-    ProvVisConfig,
-    ProvVisCreator
+  EventConfig,
+  ProvVisConfig,
+  ProvVisCreator
 } from "@visdesignlab/trrack-vis";
 
 import {
@@ -46,7 +26,7 @@ import {
     symbolSquare,
     symbolStar,
     symbolTriangle,
-    symbolWye
+    // symbolWye
 } from "d3-shape";
 import * as React from "react";
 import {style} from "typestyle";
@@ -78,20 +58,6 @@ export class SideBar extends Widget {
                 }
             });
         });
-
-
-        // shell.currentChanged.connect((shell: LabShell) => {
-        //     const currentWidget = shell.currentWidget;
-        //     if (currentWidget === null || (currentWidget instanceof NotebookPanel) === false) {
-        //         notebookProvenance = null;
-        //         this.update();
-        //         return;
-        //     }
-        //
-        //     const notebook: Notebook = (currentWidget as NotebookPanel).content;
-        //     notebookProvenance = (notebookModelCache.has(notebook)) ? notebookModelCache.get(notebook)! : null;
-        //     this.update();
-        // });
 
         let topBar = document.createElement("div");
         this.node.appendChild(topBar);
@@ -256,8 +222,3 @@ function createEventConfig<E extends string>(prov: Provenance<unknown, string, u
   }
   return conf;
 }
-
-
-
-
-
