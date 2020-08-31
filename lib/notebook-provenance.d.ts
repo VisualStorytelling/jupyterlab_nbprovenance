@@ -27,12 +27,13 @@ export declare const EventTypes: string[];
 export declare class NotebookProvenance {
     readonly notebook: Notebook;
     private context;
+    private provenanceView;
     private _actionFunctions;
     private _nbtracker;
     private _prov;
     pauseTracking: boolean;
     pauseObserverExecution: boolean;
-    constructor(notebook: Notebook, context: DocumentRegistry.IContext<INotebookModel>);
+    constructor(notebook: Notebook, context: DocumentRegistry.IContext<INotebookModel>, provenanceView: any);
     private init;
     protected saveProvenanceGraph(): void;
     get nbtracker(): NotebookProvenanceTracker;

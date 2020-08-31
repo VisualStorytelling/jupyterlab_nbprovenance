@@ -1,15 +1,19 @@
-import { ApplicationExtra, ApplicationState, EventTypes } from './notebook-provenance';
 import { LabShell } from "@jupyterlab/application";
-import { INotebookTracker } from '@jupyterlab/notebook';
 import { Widget } from "@lumino/widgets";
 import { Message } from "@lumino/messaging";
+import "./action-listener";
 import "../style/side-bar.css";
-import { Provenance } from "@visdesignlab/trrack";
+/**
+ * interface representing the state of the application
+ */
+export interface INodeState {
+    selectedCell: string;
+}
 /**
  * The main view for the notebook provenance.
  */
 export declare class SideBar extends Widget {
-    constructor(shell: LabShell, nbTracker: INotebookTracker);
+    constructor(shell: LabShell);
     /**
      * The summary text element associated with the widget.
      */
@@ -23,11 +27,9 @@ export declare class SideBar extends Widget {
      */
     onUpdateRequest(msg: Message): Promise<void>;
     /**
-     * A message handler invoked on a `'before-show'` message.
+     * Called after the widget is attached to the DOM
      *
-     * #### Notes
-     * The default implementation of this handler is a no-op.
+     * Make sure the widget is rendered, even if the model has not changed.
      */
-    protected onBeforeShow(msg: Message): void;
+    protected onAfterAttach(msg: Message): void;
 }
-export declare function provVisUpdate(prov: Provenance<ApplicationState, EventTypes, ApplicationExtra>): void;
