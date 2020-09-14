@@ -1211,9 +1211,9 @@
     "@types/prop-types" "*"
     csstype "^2.2.0"
 
-"@visdesignlab/trrack-vis@richardwolfmayr/trrack-vis#03e1472f8886cc9222362ca093ce2a0ca7dfd256":
+"@visdesignlab/trrack-vis@richardwolfmayr/trrack-vis#2c4b458a9e6a404a7a890be23bfdb0401a95c48d":
   version "0.0.0"
-  resolved "https://codeload.github.com/richardwolfmayr/trrack-vis/tar.gz/03e1472f8886cc9222362ca093ce2a0ca7dfd256"
+  resolved "https://codeload.github.com/richardwolfmayr/trrack-vis/tar.gz/2c4b458a9e6a404a7a890be23bfdb0401a95c48d"
   dependencies:
     "@visdesignlab/trrack" "^1.2.0"
     d3 "^5.15.0"

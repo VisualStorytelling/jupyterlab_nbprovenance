@@ -48,7 +48,7 @@
     "@types/react": "^16.9.38",
     "@types/react-dom": "^16.9.8",
     "@visdesignlab/trrack": "^1.2.0",
-    "@visdesignlab/trrack-vis": "richardwolfmayr/trrack-vis#03e1472f8886cc9222362ca093ce2a0ca7dfd256",
+    "@visdesignlab/trrack-vis": "richardwolfmayr/trrack-vis#2c4b458a9e6a404a7a890be23bfdb0401a95c48d",
     "awesome-typescript-loader": "^5.2.1",
     "circular-json": "^0.5.9",
     "d3": "^5.12.0",
