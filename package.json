@@ -7,7 +7,7 @@
     "jupyterlab",
     "jupyterlab extension"
   ],
-  "homepage": "https://github.com/richardwolfmayr/jupyterlab_nbprovenance",
+  "homepage": "https://github.com/richardwolfmayr/jupyterlab_nbprovenance/",
   "bugs": {
     "url": "https://github.com/richardwolfmayr/jupyterlab_nbprovenance/issues"
   },
