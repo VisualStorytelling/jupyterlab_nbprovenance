@@ -9,6 +9,7 @@ import { ILauncher } from '@jupyterlab/launcher';
 import { IMainMenu } from '@jupyterlab/mainmenu';
 import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 import {ExamplePanel} from './cell-history-panel';
+import './button-bar';
 
 /**
  * The command IDs used by the console plugin.
