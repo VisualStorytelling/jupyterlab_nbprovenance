@@ -29,14 +29,14 @@ export class ExamplePanel extends StackedPanel {
   ) {
     super();
     this.addClass(PANEL_CLASS);
-    this.id = "kernel-output-panel";
-    this.title.label = "Kernel Output Example View";
+    this.id = "cell-history-panel";
+    this.title.label = "Cell history View";
     this.title.closable = true;
 
     this._sessionContext = new SessionContext({
       sessionManager: manager.sessions,
       specsManager: manager.kernelspecs,
-      name: "Kernel Output",
+      name: "Cell History",
     });
 
     this._outputareamodel = new OutputAreaModel();

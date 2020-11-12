@@ -76,13 +76,13 @@ function activate(app: JupyterLab, restorer: ILayoutRestorer, nbTracker: INotebo
 
   // add menu tab
   const exampleMenu = new Menu({ commands });
-  exampleMenu.title.label = 'Kernel Output';
+  exampleMenu.title.label = 'Cell History';
   mainMenu.addMenu(exampleMenu);
 
   // add commands to registry
   commands.addCommand(CommandIDs.create, {
-    label: 'Open the Kernel Output Panel',
-    caption: 'Open the Kernel Output Panel',
+    label: 'Open the Cell History Panel',
+    caption: 'Open the Cell History Panel',
     execute: createPanel
   });
 
