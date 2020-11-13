@@ -1,15 +1,16 @@
-import { JupyterLab, JupyterFrontEndPlugin, ILayoutRestorer } from '@jupyterlab/application';
+import {ILayoutRestorer, JupyterFrontEndPlugin, JupyterLab} from '@jupyterlab/application';
 import '../style/index.css';
-import { NotebookPanel, Notebook, INotebookTracker } from '@jupyterlab/notebook';
-import { SideBar } from './side-bar';
-import { NotebookProvenance } from './notebook-provenance';
-import {Widget, Menu} from '@lumino/widgets';
-import { ICommandPalette, InputDialog } from '@jupyterlab/apputils';
-import { ILauncher } from '@jupyterlab/launcher';
-import { IMainMenu } from '@jupyterlab/mainmenu';
-import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
+import {INotebookTracker, Notebook, NotebookPanel} from '@jupyterlab/notebook';
+import {SideBar} from './side-bar';
+import {NotebookProvenance} from './notebook-provenance';
+import {Menu, Widget} from '@lumino/widgets';
+import {ICommandPalette, InputDialog, ToolbarButton} from '@jupyterlab/apputils';
+import {ILauncher} from '@jupyterlab/launcher';
+import {IMainMenu} from '@jupyterlab/mainmenu';
+import {IRenderMimeRegistry} from '@jupyterlab/rendermime';
 import {ExamplePanel} from './cell-history-panel';
-import './button-bar';
+
+// import {DocumentRegistry} from "@jupyterlab/docregistry";
 
 /**
  * The command IDs used by the console plugin.
@@ -34,15 +35,31 @@ export default plugin;
 
 export const notebookModelCache = new Map<Notebook, NotebookProvenance>();
 
-function activate(app: JupyterLab, restorer: ILayoutRestorer, nbTracker: INotebookTracker,
+function activate(
+    app: JupyterLab,
+    restorer: ILayoutRestorer,
+    nbTracker: INotebookTracker,
     palette: ICommandPalette,
     mainMenu: IMainMenu,
     rendermime: IRenderMimeRegistry,
     launcher: ILauncher | null
   ): void {
+
+  // Insert button panel
+  let button = new ToolbarButton({
+    className: 'cell-history-button',
+    iconClass: 'fa fa-clock',
+    onClick: function () {
+      alert('Cell history button clicked');
+    },
+    tooltip: 'Open cell history'
+  });
+
+  // Todo Detect the current active cell and pass it as a param
   let provenanceView: Widget;
   nbTracker.widgetAdded.connect((_: INotebookTracker, nbPanel: NotebookPanel) => {
     // wait until the session with the notebook model is ready
+    nbPanel.toolbar.insertItem(10, 'cellHistory', button);
     nbPanel.sessionContext.ready.then(() => {
       const notebook: Notebook = nbPanel.content;
       if (!notebookModelCache.has(notebook)) {
