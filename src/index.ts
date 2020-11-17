@@ -1,9 +1,9 @@
-import { JupyterLab, JupyterFrontEndPlugin, ILayoutRestorer } from '@jupyterlab/application';
+import {ILayoutRestorer, JupyterFrontEndPlugin, JupyterLab} from '@jupyterlab/application';
 import '../style/index.css';
 import { Notebook, INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
 // import { SideBar } from './side-bar';
 import { NotebookProvenance } from './notebook-provenance';
-import { ICommandPalette, MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
+import { ICommandPalette, MainAreaWidget, ToolbarButton, WidgetTracker } from '@jupyterlab/apputils';
 import { ILauncher } from '@jupyterlab/launcher';
 import { IMainMenu } from '@jupyterlab/mainmenu';
 import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
@@ -25,12 +25,25 @@ export default plugin;
 
 export const notebookModelCache = new Map<Notebook, NotebookProvenance>();
 
-function activate(app: JupyterLab, restorer: ILayoutRestorer, nbTracker: INotebookTracker,
+function activate(
+    app: JupyterLab,
+    restorer: ILayoutRestorer,
+    nbTracker: INotebookTracker,
     palette: ICommandPalette,
     mainMenu: IMainMenu,
     rendermime: IRenderMimeRegistry,
     launcher: ILauncher | null
   ): void {
+
+  // Insert button panel
+  let button = new ToolbarButton({
+    className: 'cell-history-button',
+    iconClass: 'fa fa-clock',
+    onClick: function () {
+      alert('Cell history button clicked');
+    },
+    tooltip: 'Open cell history'
+  });
 
   // Provenance Tree
 
@@ -108,6 +121,8 @@ function activate(app: JupyterLab, restorer: ILayoutRestorer, nbTracker: INotebo
   // Add the notebook provenance connection to the tree view
 
   nbTracker.widgetAdded.connect((_: INotebookTracker, nbPanel: NotebookPanel) => {
+    nbPanel.toolbar.insertItem(10, 'cellHistory', button);
+
     // wait until the session with the notebook model is ready
     nbPanel.sessionContext.ready.then(() => {
       const notebook: Notebook = nbPanel.content;
