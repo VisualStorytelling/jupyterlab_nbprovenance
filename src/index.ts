@@ -1,24 +1,15 @@
 import { JupyterLab, JupyterFrontEndPlugin, ILayoutRestorer } from '@jupyterlab/application';
 import '../style/index.css';
-import { NotebookPanel, Notebook, INotebookTracker } from '@jupyterlab/notebook';
-import { SideBar } from './side-bar';
+import { Notebook, INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
+// import { SideBar } from './side-bar';
 import { NotebookProvenance } from './notebook-provenance';
-import {Widget, Menu} from '@lumino/widgets';
-import { ICommandPalette, InputDialog } from '@jupyterlab/apputils';
+import { ICommandPalette, MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
 import { ILauncher } from '@jupyterlab/launcher';
 import { IMainMenu } from '@jupyterlab/mainmenu';
 import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
-import {ExamplePanel} from './cell-history-panel';
+import {CellHistoryPanel} from './cell-history-panel';
 import './button-bar';
-
-/**
- * The command IDs used by the console plugin.
- */
-// tslint:disable-next-line:no-namespace
-namespace CommandIDs {
-  export const create = 'kernel-output:create';
-  export const execute = 'kernel-output:execute';
-}
+import { SideBar } from './side-bar';
 
 /**
  * Initialization data for the jupyterlab_nbprovenance extension.
@@ -40,90 +31,94 @@ function activate(app: JupyterLab, restorer: ILayoutRestorer, nbTracker: INotebo
     rendermime: IRenderMimeRegistry,
     launcher: ILauncher | null
   ): void {
-  let provenanceView: Widget;
+
+  // Provenance Tree
+
+  const provenanceViewCommand: string = 'provenanceView:open';
+  let provenanceView: SideBar;
+  palette.addItem({ command: provenanceViewCommand, category: 'Tutorial' });
+
+  let sidebarTracker = new WidgetTracker({
+    namespace: 'provenanceView'
+  });
+  restorer.restore(sidebarTracker, {
+    command: provenanceViewCommand,
+    name: () => 'provenanceView'
+  });
+  
+  app.commands.addCommand(provenanceViewCommand, {
+    label: 'Notebook Provenance View',
+    execute: () => {
+      if (!provenanceView) {
+        provenanceView = new SideBar(app.shell, nbTracker);
+        provenanceView.id = 'nbprovenance-view';
+        provenanceView.title.caption = 'Notebook Provenance';
+        provenanceView.title.iconClass = 'jp-nbprovenanceIcon';
+      }
+
+      if (!sidebarTracker.has(provenanceView)) {
+        sidebarTracker.add(provenanceView);
+      }
+      if (!provenanceView.isAttached) {
+        app.shell.add(provenanceView, 'right');
+      }
+      provenanceView.update();
+    
+      app.shell.activateById(provenanceView.id);
+    }
+  });
+
+  // Cell History
+
+  const cellHistorycommand: string = 'cellHistoryWidget:open';
+  let cellHistoryWidget: MainAreaWidget<CellHistoryPanel>;
+  palette.addItem({ command: cellHistorycommand, category: 'Tutorial' });
+
+  let historyWidgetTracker = new WidgetTracker<MainAreaWidget<CellHistoryPanel>>({
+    namespace: 'cellHistoryWidget'
+  });
+  restorer.restore(historyWidgetTracker, {
+    command: cellHistorycommand,
+    name: () => 'cellHistoryWidget'
+  });
+  
+  app.commands.addCommand(cellHistorycommand, {
+    label: 'Cell History',
+    execute: () => {
+      if (!cellHistoryWidget) {
+        const content = new CellHistoryPanel(rendermime, app.shell, nbTracker);
+        cellHistoryWidget = new MainAreaWidget({content});
+        cellHistoryWidget.id = 'nbprovenance-cellhistory';
+        cellHistoryWidget.title.label = 'Cell History View';
+        cellHistoryWidget.title.closable = true;
+      }
+
+      if (!historyWidgetTracker.has(cellHistoryWidget)) {
+        historyWidgetTracker.add(cellHistoryWidget);
+      }
+      if (!cellHistoryWidget.isAttached) {
+        app.shell.add(cellHistoryWidget, 'main');
+      }
+      cellHistoryWidget.content.update();
+    
+      app.shell.activateById(cellHistoryWidget.id);
+    }
+  });
+  
+  // Add the notebook provenance connection to the tree view
+
   nbTracker.widgetAdded.connect((_: INotebookTracker, nbPanel: NotebookPanel) => {
     // wait until the session with the notebook model is ready
     nbPanel.sessionContext.ready.then(() => {
       const notebook: Notebook = nbPanel.content;
       if (!notebookModelCache.has(notebook)) {
-        notebookModelCache.set(notebook, new NotebookProvenance(notebook, nbPanel.context, provenanceView));
-      }
-    });
-  });
-
-  provenanceView = new SideBar(app.shell, nbTracker);
-  provenanceView.id = 'nbprovenance-view';
-  provenanceView.title.caption = 'Notebook Provenance';
-  provenanceView.title.iconClass = 'jp-nbprovenanceIcon';
-  restorer.add(provenanceView, 'nbprovenance_view');
-  app.shell.add(provenanceView, 'right', {rank: 700}); // rank was chosen arbitrarily
-
-  const manager = app.serviceManager;
-  const { commands, shell } = app;
-  const category = 'Extension Examples';
-
-  let panel: ExamplePanel;
-
-  /**
-   * Creates a example panel.
-   *
-   * @returns The panel
-   */
-  async function createPanel(): Promise<ExamplePanel> {
-    panel = new ExamplePanel(manager, rendermime);
-    shell.add(panel, 'main');
-    return panel;
-  }
-
-  // add menu tab
-  const exampleMenu = new Menu({ commands });
-  exampleMenu.title.label = 'Cell History';
-  mainMenu.addMenu(exampleMenu);
-
-  // add commands to registry
-  commands.addCommand(CommandIDs.create, {
-    label: 'Open the Cell History Panel',
-    caption: 'Open the Cell History Panel',
-    execute: createPanel
-  });
-
-  commands.addCommand(CommandIDs.execute, {
-    label: 'Contact Kernel and Execute Code',
-    caption: 'Contact Kernel and Execute Code',
-    execute: async () => {
-      // Create the panel if it does not exist
-      if (!panel) {
-        await createPanel();
-      }
-      // Prompt the user about the statement to be executed
-      const input = await InputDialog.getText({
-        title: 'Code to execute',
-        okLabel: 'Execute',
-        placeholder: 'Statement to execute'
-      });
-      // Execute the statement
-      if (input.button.accept) {
-        const code = input.value;
-        if (code !== null) {
-          panel.execute(code);
+        if (provenanceView && cellHistoryWidget) {
+          const prov = new NotebookProvenance(notebook, nbPanel.context, provenanceView, cellHistoryWidget.content);
+          notebookModelCache.set(notebook, prov );
         }
       }
-    }
-  });
-
-  // add items in command palette and menu
-  [CommandIDs.create, CommandIDs.execute].forEach(command => {
-    palette.addItem({ command, category });
-    exampleMenu.addItem({ command });
-  });
-
-  // Add launcher
-  if (launcher) {
-    launcher.add({
-      command: CommandIDs.create,
-      category: category
     });
-  }
+  });
 }
 
 

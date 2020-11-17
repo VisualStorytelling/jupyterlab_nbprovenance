@@ -4,10 +4,12 @@ import {
   initProvenance,
   Provenance
 } from '@visdesignlab/trrack';
+
 import {NotebookProvenanceTracker} from './provenance-tracker'
-import {provVisUpdate} from "./side-bar";
+import {provVisUpdate, SideBar} from "./side-bar";
 import {PartialJSONValue} from '@lumino/coreutils';
 import {DocumentRegistry} from '@jupyterlab/docregistry';
+import { CellHistoryPanel, cellHistoryUpdate } from './cell-history-panel';
 
 
 /**
@@ -62,7 +64,7 @@ export class NotebookProvenance {
 
 
   // Why is this context not working like app, notebook, sessionContext?
-  constructor(public readonly notebook: Notebook, private context: DocumentRegistry.IContext<INotebookModel>,private provenanceView: any) {
+  constructor(public readonly notebook: Notebook, private context: DocumentRegistry.IContext<INotebookModel>,private provenanceView: SideBar, private cellHistoryPanel: CellHistoryPanel) {
     this.init();
   }
 
@@ -118,6 +120,9 @@ export class NotebookProvenance {
       if(this.provenanceView.isVisible){
         provVisUpdate(this._prov);
       }
+      if(this.cellHistoryPanel.isVisible){
+        cellHistoryUpdate(this._prov);
+      }
     });
 
     this.prov.addObserver(["activeCell"], () => {
@@ -138,6 +143,9 @@ export class NotebookProvenance {
 
       if(this.provenanceView.isVisible){
         provVisUpdate(this._prov);
+      }
+      if(this.cellHistoryPanel.isVisible){
+        cellHistoryUpdate(this._prov);
       }
     });
 

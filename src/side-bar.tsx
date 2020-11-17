@@ -44,7 +44,8 @@ export class SideBar extends Widget {
     super();
 
     this.addClass("jp-nbprovenance-view");
-
+    
+    // Connect with new notebook widgets as they are created, so we can track the provenance in them
     nbTracker.widgetAdded.connect((_: INotebookTracker, nbPanel: NotebookPanel) => {
       // wait until the session with the notebook model is ready
       nbPanel.sessionContext.ready.then(() => {

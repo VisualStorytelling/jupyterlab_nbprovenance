@@ -15,8 +15,6 @@ export class NotebookProvenanceTracker {
   public _prevModel: PartialJSONValue = Object();
   // public _prevValuesLoadedByProvenance: Boolean;
 
-
-
   /**
    *
    */
